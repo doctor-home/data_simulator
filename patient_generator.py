@@ -168,36 +168,87 @@ def generate_random_triage_levels_for_a_patient(age):
     return triage_levels
 
 
-def generate_historical_data(triage_levels: list) -> pd.DataFrame:
+def get_readouts(tl, ntp, get_one_readout):
 
-    def get_heart_beats(tl: int, ntp: int) -> list:
+    criteria = np.random.choice(
+        ["random", "triage_level"],
+        [0.1, 0.9]
+    )
+    if criteria["random"]:
+        severity = np.random.uniform(0, 1)
+    else:  # triage level based criteria
+        severity = tl / np.max(TRIAGE_LEVELS) + np.random.normal(scale=0.3)
+        severity = np.clip(severity, a_min=0, a_max=1)
 
-        criteria = np.random.choice(
-            ["random", "triage_level"],
-            [0.2, 0.8]
-        )
+    return [get_one_readout(severity) for _ in range(ntp)]
 
-        if criteria["random"]:
-            severity = np.random.uniform(0, 1)
-        else:  # triage level
-            severity = tl / np.max(TRIAGE_LEVELS) + np.random.normal(scale=0.3)
-            severity = np.clip(severity, a_min=0, a_max=1)
 
-        if 0 < severity < 0.5:
-            return np.random.randint(30, high=60)
-        elif 0.5 <= severity < 0.7:
+def get_heart_beats(tl: int, ntp: int) -> list:
+    """Triage level and number of time-points to random heart beats per min"""
+    def get_one_readout(sev):
+        if 0 < sev < 0.6:
+            return np.random.randint(60, high=100)
+        elif 0.6 <= sev < 0.8:
             return np.random.randint(100, high=140)
         else:
             return np.random.randint(140, high=150)
 
-    def get_oxygenation(tl: int, ntp: int) -> list:
-        return []
+    return get_readouts(tl, ntp, get_one_readout)
 
-    def get_temperature(tl: int, ntp: int) -> list:
-        return []
 
-    def get_breathing_rate(tl: int, ntp: int) -> list:
-        return []
+def get_oxygenation(tl: int, ntp: int) -> list:
+    """Triage level and number of time-points to random oxygenation in
+    percentage oxygenated haemoglobin"""
+    def get_one_readout(sev):
+        if 0 < sev < 0.7:
+            # Normal is between 90% and 100%
+            return np.random.randint(90, high=100)
+        elif 0.7 <= sev < 0.8:
+            # mild hypoxia: 85% to 90%
+            return np.random.randint(85, high=90)
+        elif 0.8 <= sev < 0.95:
+            # hypoxia: 80% to 85%
+            return np.random.randint(80, high=85)
+        else:
+            # severe hypoxia: 75% to 80%
+            return np.random.randint(75, high=80)
+
+    return get_readouts(tl, ntp, get_one_readout)
+
+
+def get_temperature(tl: int, ntp: int) -> list:
+    """Triage level and number of time-points to temperature in Celsius"""
+    def get_one_readout(sev):
+        if 0 <= sev < 0.6:
+            # normal
+            np.round(np.random.uniform(36.5, 37.5), decimals=1)
+        elif 0.6 <= sev < 0.85:
+            # medium
+            np.round(np.random.uniform(37.5, 39), decimals=1)
+        else:
+            # high
+            return np.round(np.random.uniform(39, 41), decimals=1)
+
+    return get_readouts(tl, ntp, get_one_readout)
+
+
+def get_breathing_rate(tl: int, ntp: int) -> list:
+    """Triage level and number of time-points to breathing rate per minute"""
+    def get_one_readout(sev):
+        # normal 12 to 20
+        if 0 < sev < 0.7:
+            return np.random.randint(12, high=20)
+        # abnormal 20 to 25
+        if 0 < sev < 0.7:
+            return np.random.randint(20, high=25)
+        # abnormal 25 to 30
+        if 0 < sev < 0.7:
+            return np.random.randint(25, high=30)
+
+    return get_readouts(tl, ntp, get_one_readout)
+
+
+def generate_historical_data(triage_levels: list) -> pd.DataFrame:
 
     nr_measurements = np.random.randint(3, 50)
     timepoints = fake.time_series(
