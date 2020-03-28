@@ -6,7 +6,7 @@ import glob
 import pandas as pd
 import numpy as np
 from faker import Faker
-from faker.providers import phone_number, address, person, date_time
+from faker.providers import phone_number, address, person, date_time, lorem
 from tqdm import tqdm
 import string
 
@@ -15,6 +15,7 @@ fake.add_provider(person)
 fake.add_provider(phone_number)
 fake.add_provider(address)    
 fake.add_provider(date_time)
+fake.add_provider(lorem)
 
 
 NOW = datetime.datetime(2020, 3, 28, 17, 32, 8, 947063)
@@ -90,12 +91,13 @@ def generate_physicians(pfi_physicians):
         last_name = fake.last_name()
         names.append("Dr. " + first_name + " " + last_name)
         usernames.append(string.lower(first_name + "_" + last_name).replace(" ", ""))
-        password.append(fake.)
+        passwords.append("_".join(fake.words(nb=3)))
         
-
 
     physician_df["physician_name"] = names
     physician_df["physician_uuid"] = physician_uuids
+    physician_df["physician_username"] = usernames
+    physician_df["physician_password"] = passwords
 
 
     physician_df.to_csv(pfi_physicians)
