@@ -11,26 +11,28 @@ fake = Faker('en_UK')
 fake.add_provider(date_time)
 
 
-FIX_COLUMN_NAMES = ["patient_uuid", 
+FIX_COLUMN_NAMES = ["patientID", 
                     "name", 
                     "surname", 
                     "phone", 
                     "city", 
+                    "language",
                     "age", 
                     "preconditions", 
                     "fitness",
-                    "physician_name", 
-                    "physician_uuid",
-                    "center_name",
-                    "center_uuid"]
+                    "smoker",
+                    "clinician", 
+                    "clinicianID",
+                    "organization",
+                    "organizationID"]
 
 TIME_VARIABLE_COLUMNS = ["timestamp",
-                         "nr_days", 
-                         "hearth_rate",
-                         "oxigen_level",
+                         "daysUnderInspection", 
+                         "hearthBeat",
+                         "oxygenation",
                          "temperature",
-                         "breathing_rate",
-                         "label"]
+                         "breathingRate",
+                         "sick"]
 
 
 unique_patients = pd.read_csv("data/unique_patients.csv")
@@ -40,15 +42,23 @@ unique_patients = unique_patients.set_index("Unnamed: 0")
 monitored_patients = unique_patients.sample(frac=0.2, random_state=42)
 
 # helper functions:
+# helper functions:
 def get_hearthrate(sick):
     """
     get the heartrate of the patient
     params:
         sick (bool): different values if patient is sick
     """
+    # A normal resting heart rate for adults ranges from 60 to 100 beats per minute
+    if sick:
+        high = bool(np.random.choice([0,1], 1)[0])
+        if high:
+            return np.random.randint(100, high=160)
+        else:
+            return np.random.randint(30, high=60)
     
-    # TODO
-    return 1
+    else:
+        return np.random.randint(60, high=100)
 
 
 def get_oxigen(sick):
@@ -57,9 +67,13 @@ def get_oxigen(sick):
     params:
         sick (bool): different values if patient is sick
     """
+    if sick:
+        return np.random.uniform(low=0.89, high=0.94, size=1)[0]
     
-    # TODO
-    return 2
+    else:
+        mu, sigma = 0.97, 0.2 # mean and standard deviation
+        rate = np.random.normal(mu, sigma, 1,)[0]
+        return rate if rate < 0.995 else 0.995
 
 
 def get_temperature(sick):
@@ -68,9 +82,12 @@ def get_temperature(sick):
     params:
         sick (bool): different values if patient is sick
     """
+    if sick:
+        return np.random.uniform(low=37.5, high=42.0, size=1)[0]
     
-    # TODO
-    return 3
+    else:
+        mu, sigma = 36.5, 0.5 # mean and standard deviation
+        return np.random.normal(mu, sigma, 1)[0]
 
 
 def get_breathing(sick):
@@ -79,18 +96,16 @@ def get_breathing(sick):
     params:
         sick (bool): different values if patient is sick
     """
+    if sick:
+        high = bool(np.random.choice([0,1], 1)[0])
+        if high:
+            return np.random.randint(26, high=50)
+        else:
+            return np.random.randint(3, high=12)
     
-    # TODO
-    return 4
+    else:
+        return np.random.randint(12, high=25)
 
-def get_breathing(sick):
-    """
-    get the breathing of the patient
-    params:
-        sick (bool): different values if patient is sick
-    """
-    
-    pass
 
 
 measurement_df = pd.DataFrame(columns = FIX_COLUMN_NAMES + TIME_VARIABLE_COLUMNS)
@@ -114,11 +129,11 @@ for _, row in tqdm(monitored_patients.iterrows()):
             get_hearthrate(sick),
             get_oxigen(sick),
             get_temperature(sick),
-            get_breathing(sick)
+            get_breathing(sick),
+            sick
         ]
         
         # Add to existing dataframe
         measurement_df.loc[len(measurement_df)] = new_values
     
-    
-    
+measurement_df.to_csv("data/measured_data.csv")

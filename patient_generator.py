@@ -64,9 +64,11 @@ FIX_COLUMN_NAMES = ["patient_uuid",
                     "surname", 
                     "phone", 
                     "city", 
+                    "language",
                     "age", 
                     "preconditions", 
                     "fitness",
+                    "smoker",
                     "physician_name", 
                     "physician_uuid",
                     "center_name",
@@ -96,14 +98,17 @@ for _ in tqdm(range(10_000)):
                   fake.last_name(), #last name
                   fake.phone_number(), # phone
                   fake.city(), # city
+                  np.random.choice(["English","German", "French", "Italian", "Dutch"], 1)[0], # language
                   this_year - fake.date_of_birth(tzinfo=None, minimum_age=10, maximum_age=105).year, #age
                   np.random.choice(list(PRECONDITIONS.keys()), 1, p=list(PRECONDITIONS.values()))[0], #precondition
                   np.random.randint(10), # fitness
+                  bool(np.random.choice([0,1], 1,p=[0.85,0.15])[0]), # smoker
                   physician["physician_name"].values.tolist(), #physician name
                   physician["physician_uuid"].values.tolist(), #physician uuid
                   center["center_name"].values.tolist(), # center name
                   center["center_uuid"].values.tolist() # center uuid
                   ]
+    
     
     fix_df.loc[len(fix_df)] = row
     
