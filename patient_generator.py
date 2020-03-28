@@ -158,12 +158,12 @@ def generate_random_triage_levels_for_a_patient(age):
 
     num_of_triage_level_variations = np.random.choice(
         [1, 2, 3, 4],
-        [0.5, 0.3, 0.1]
+        p=[0.5, 0.3, 0.1, 0.1]
     )
     triage_levels = np.random.choice(
         TRIAGE_LEVELS,
-        age_weights(normalized_age, len(TRIAGE_LEVELS)),
-        num_of_triage_level_variations
+        p=age_weights(normalized_age, len(TRIAGE_LEVELS)),
+        size=num_of_triage_level_variations
     )
     return triage_levels
 
@@ -172,7 +172,7 @@ def get_readouts(tl, ntp, get_one_readout):
 
     criteria = np.random.choice(
         ["random", "triage_level"],
-        [0.1, 0.9]
+        p=[0.1, 0.9]
     )
     if criteria["random"]:
         severity = np.random.uniform(0, 1)
