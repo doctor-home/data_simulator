@@ -228,12 +228,6 @@ def generate_data_for_each_patient(pfo_patients_data, pfi_patients_list):
         historical_data_df.to_csv(pfi_patient_data)
 
 
-
-
-
-        pass
-
-
 if __name__ == "__main__":
     # pfi: path to file
     # pfo: path to folder
