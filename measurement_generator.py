@@ -99,7 +99,7 @@ def get_breathing(is_sick: bool):
         patient (bool): different values if patient is patient
     """
     if is_sick:
-        high = bool(np.random.choice([0,1], 1)[0])
+        high = bool(np.random.choice([0, 1], 1)[0])
         if high:
             return np.random.randint(26, high=50)
         else:
