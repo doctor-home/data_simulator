@@ -8,9 +8,8 @@ import numpy as np
 from faker import Faker
 from faker.providers import phone_number, address, person, date_time, lorem
 from tqdm import tqdm
-import string
 
-fake = Faker(["it_IT", "en_UK", "de_DE", "nl_NL", "fr_FR"])
+fake = Faker(["en_UK"])
 fake.add_provider(person)
 fake.add_provider(phone_number)
 fake.add_provider(address)
@@ -90,7 +89,7 @@ def generate_physicians(pfi_physicians):
         first_name = fake.first_name()
         last_name = fake.last_name()
         names.append("Dr. " + first_name + " " + last_name)
-        usernames.append(string.lower(first_name + "_" + last_name).replace(" ", ""))
+        usernames.append((first_name + "_" + last_name).replace(" ", "").lower())
         passwords.append("_".join(fake.words(nb=3)))
 
     physician_df["physician_name"] = names
@@ -280,37 +279,40 @@ def generate_historical_data(triage_levels: list) -> pd.DataFrame:
         distrib=None,
         tzinfo=None,
     )
+    
     measurements_df = pd.DataFrame(columns=TIME_VARIABLE_COLUMNS)
-
-    num_timepoints = len(list(timepoints))
-
+    
+    timepoints = list(timepoints)
+    num_timepoints = len(timepoints)
+    
     for triage_level in triage_levels:
         heart_beat = get_heart_beats(triage_level, num_timepoints)
         oxygenation = get_oxygenation(triage_level, num_timepoints)
         temperature = get_temperature(triage_level, num_timepoints)
         breathing_rate = get_breathing_rate(triage_level, num_timepoints)
 
-        for tp_n, tp in timepoints:
+        for tp_n, tp in enumerate(timepoints):
             data_at_tp = dict(
-                timestamp=tp,
+                timestamp=tp[0],
                 heart_beat=heart_beat[tp_n],
                 oxygenation=oxygenation[tp_n],
                 temperature=temperature[tp_n],
                 breathing_rate=breathing_rate[tp_n],
                 triage_level=triage_level,
             )
-            measurements_df.append(data_at_tp, ignore_index=True)
+            measurements_df = measurements_df.append(data_at_tp, ignore_index=True)
 
     return measurements_df
 
 
 def generate_data_for_each_patient(pfo_patients_data, pfi_patients_list):
-    """Get all the patients from pfi_patients_list and create their dummy history."""
+    """
+    Get all the patients from pfi_patients_list and create their dummy history.
+    """
     assert os.path.exists(pfi_patients_list), pfi_patients_list
+
     df_patients = pd.read_csv(pfi_patients_list, index_col=0)
-    for patient_uuid, patient_age in tqdm(
-        zip(df_patients["patientID"], df_patients["age"])
-    ):
+    for patient_uuid, patient_age in tqdm(zip(df_patients["patientID"], df_patients["age"])):
         pfi_patient_data = os.path.join(pfo_patients_data, f"{patient_uuid}.csv")
         triage_levels = generate_random_triage_levels_for_a_patient(patient_age)
         historical_data_df = generate_historical_data(triage_levels)
@@ -340,7 +342,7 @@ if __name__ == "__main__":
     generate_physicians(pfi_physicians_)
     print("Generating patients list...")
     generate_patients(
-        pfi_patients_list_, pfi_centers=pfi_centers_, pfi_physicians=pfi_physicians_
+        pfi_patients_list_, pfi_centers=pfi_centers_, pfi_physicians=pfi_physicians_,
     )
 
     pfo_patients_data_ = os.path.join(data_folder, "patients_data")
