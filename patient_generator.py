@@ -174,7 +174,7 @@ def get_readouts(tl, ntp, get_one_readout):
         ["random", "triage_level"],
         p=[0.1, 0.9]
     )
-    if criteria["random"]:
+    if criteria == "random":
         severity = np.random.uniform(0, 1)
     else:  # triage level based criteria
         severity = tl / np.max(TRIAGE_LEVELS) + np.random.normal(scale=0.3)
@@ -260,12 +260,13 @@ def generate_historical_data(triage_levels: list) -> pd.DataFrame:
     )
     measurements_df = pd.DataFrame(columns=TIME_VARIABLE_COLUMNS)
 
-    for triage_level in triage_levels:
+    num_timepoints = len(list(timepoints))
 
-        heart_beat = get_heart_beats(triage_level, len(list(timepoints)))
-        oxygenation = get_oxygenation(triage_level, len(timepoints))
-        temperature = get_temperature(triage_level, len(timepoints))
-        breathing_rate = get_breathing_rate(triage_level, len(timepoints))
+    for triage_level in triage_levels:
+        heart_beat = get_heart_beats(triage_level, num_timepoints)
+        oxygenation = get_oxygenation(triage_level, num_timepoints)
+        temperature = get_temperature(triage_level, num_timepoints)
+        breathing_rate = get_breathing_rate(triage_level, num_timepoints)
 
         for tp_n, tp in timepoints:
             data_at_tp = dict(
