@@ -120,8 +120,8 @@ if __name__ == "__main__":
 
         # Get the number of previous measurements
         nr_measurements = np.random.choice(
-            list(range(1, 16)), 1,
-            p=(np.array(list(range(15, 0, -1))) / sum(list(range(1, 16)))).tolist())[0]
+            list(range(1, 8)), 1,
+            p=(np.array(list(range(7, 0, -1))) / sum(list(range(1, 8)))).tolist())[0]
 
         # Iterate through all the measurements
         for timestamp in fake.time_series(start_date='-{}d'.format(nr_measurements), end_date='now', precision=datetime.timedelta(days=1/3), distrib=None, tzinfo=None):
