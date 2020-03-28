@@ -10,10 +10,10 @@ from faker.providers import phone_number, address, person, date_time, lorem
 from tqdm import tqdm
 import string
 
-fake = Faker(['it_IT', 'en_UK', 'de_DE', 'nl_NL', 'fr_FR'])
+fake = Faker(["it_IT", "en_UK", "de_DE", "nl_NL", "fr_FR"])
 fake.add_provider(person)
 fake.add_provider(phone_number)
-fake.add_provider(address)    
+fake.add_provider(address)
 fake.add_provider(date_time)
 fake.add_provider(lorem)
 
@@ -44,7 +44,7 @@ FIX_COLUMN_NAMES = [
     "clinician",
     "clinicianID",
     "organization",
-    "organizationID"
+    "organizationID",
 ]
 
 TIME_VARIABLE_COLUMNS = [
@@ -53,7 +53,7 @@ TIME_VARIABLE_COLUMNS = [
     "oxygenation",
     "temperature",
     "breathing_rate",
-    "triage_level"
+    "triage_level",
 ]
 
 
@@ -92,18 +92,18 @@ def generate_physicians(pfi_physicians):
         names.append("Dr. " + first_name + " " + last_name)
         usernames.append(string.lower(first_name + "_" + last_name).replace(" ", ""))
         passwords.append("_".join(fake.words(nb=3)))
-        
 
     physician_df["physician_name"] = names
     physician_df["physician_uuid"] = physician_uuids
     physician_df["physician_username"] = usernames
     physician_df["physician_password"] = passwords
 
-
     physician_df.to_csv(pfi_physicians)
 
 
-def generate_patients(pfi_patients_list, pfi_physicians, pfi_centers, num_patients=5000):
+def generate_patients(
+    pfi_patients_list, pfi_physicians, pfi_centers, num_patients=5000
+):
     """Create unique list of patients"""
     assert os.path.exists(pfi_physicians), pfi_physicians
     assert os.path.exists(pfi_centers), pfi_centers
@@ -128,15 +128,24 @@ def generate_patients(pfi_patients_list, pfi_physicians, pfi_centers, num_patien
             fake.last_name(),
             fake.phone_number(),
             fake.city(),
-            np.random.choice(["English", "German", "French", "Italian", "Dutch"], 1)[0],  # language
-            this_year - fake.date_of_birth(tzinfo=None, minimum_age=10, maximum_age=105).year,  # age
-            np.random.choice(list(PRECONDITIONS.keys()), 1, p=list(PRECONDITIONS.values()))[0],  # precondition
+            np.random.choice(["English", "German", "French", "Italian", "Dutch"], 1)[
+                0
+            ],  # language
+            this_year
+            - fake.date_of_birth(
+                tzinfo=None, minimum_age=10, maximum_age=105
+            ).year,  # age
+            np.random.choice(
+                list(PRECONDITIONS.keys()), 1, p=list(PRECONDITIONS.values())
+            )[
+                0
+            ],  # precondition
             np.random.randint(10),  # fitness
             bool(np.random.choice([0, 1], 1, p=[0.85, 0.15])[0]),  # smoker
             physician["physician_name"].values.tolist(),
             physician["physician_uuid"].values.tolist(),
             center["center_name"].values.tolist(),
-            center["center_uuid"].values.tolist()
+            center["center_uuid"].values.tolist(),
         ]
 
         fix_df.loc[len(fix_df)] = row
@@ -146,6 +155,7 @@ def generate_patients(pfi_patients_list, pfi_physicians, pfi_centers, num_patien
 
 def generate_random_triage_levels_for_a_patient(age):
     """ Triage level is the label we want to infer. For the simulated data we are """
+
     def age_weights(p, num_vals, epsilon=0.08):
         n = num_vals + 1
         h = 1 / n
@@ -156,7 +166,7 @@ def generate_random_triage_levels_for_a_patient(age):
             intervals = [k * h_bar for k in range(n - 1)] + [1]
 
         else:
-            a, b, x = h, 1 - epsilon * (n - 1), (p - .5) / .5
+            a, b, x = h, 1 - epsilon * (n - 1), (p - 0.5) / 0.5
             pos_pivot = (b - a) * x + a
             h_bar = (1 - pos_pivot) / (n - 2)
             intervals = [0] + [1 - k * h_bar for k in range(n - 1)]
@@ -166,26 +176,22 @@ def generate_random_triage_levels_for_a_patient(age):
 
     assert age <= 117, "A new Jiroemon Kimura found."
 
-    normalized_age = int(age/117)
+    normalized_age = int(age / 117)
 
     num_of_triage_level_variations = np.random.choice(
-        [1, 2, 3, 4],
-        p=[0.5, 0.3, 0.1, 0.1]
+        [1, 2, 3, 4], p=[0.5, 0.3, 0.1, 0.1]
     )
     triage_levels = np.random.choice(
         TRIAGE_LEVELS,
         p=age_weights(normalized_age, len(TRIAGE_LEVELS)),
-        size=num_of_triage_level_variations
+        size=num_of_triage_level_variations,
     )
     return triage_levels
 
 
 def get_readouts(tl, ntp, get_one_readout):
 
-    criteria = np.random.choice(
-        ["random", "triage_level"],
-        p=[0.1, 0.9]
-    )
+    criteria = np.random.choice(["random", "triage_level"], p=[0.1, 0.9])
     if criteria == "random":
         severity = np.random.uniform(0, 1)
     else:  # triage level based criteria
@@ -197,6 +203,7 @@ def get_readouts(tl, ntp, get_one_readout):
 
 def get_heart_beats(tl: int, ntp: int) -> list:
     """Triage level and number of time-points to random heart beats per min"""
+
     def get_one_readout(sev):
         if 0 < sev < 0.6:
             return np.random.randint(60, high=100)
@@ -211,6 +218,7 @@ def get_heart_beats(tl: int, ntp: int) -> list:
 def get_oxygenation(tl: int, ntp: int) -> list:
     """Triage level and number of time-points to random oxygenation in
     percentage oxygenated haemoglobin"""
+
     def get_one_readout(sev):
         if 0 < sev < 0.7:
             # Normal is between 90% and 100%
@@ -230,6 +238,7 @@ def get_oxygenation(tl: int, ntp: int) -> list:
 
 def get_temperature(tl: int, ntp: int) -> list:
     """Triage level and number of time-points to temperature in Celsius"""
+
     def get_one_readout(sev):
         if 0 <= sev < 0.6:
             # normal
@@ -246,6 +255,7 @@ def get_temperature(tl: int, ntp: int) -> list:
 
 def get_breathing_rate(tl: int, ntp: int) -> list:
     """Triage level and number of time-points to breathing rate per minute"""
+
     def get_one_readout(sev):
         # normal 12 to 20
         if 0 < sev < 0.7:
@@ -264,11 +274,11 @@ def generate_historical_data(triage_levels: list) -> pd.DataFrame:
 
     nr_measurements = np.random.randint(3, 50)
     timepoints = fake.time_series(
-        start_date='-{}d'.format(nr_measurements),
+        start_date="-{}d".format(nr_measurements),
         end_date=NOW,
         precision=datetime.timedelta(days=1 / 3),
         distrib=None,
-        tzinfo=None
+        tzinfo=None,
     )
     measurements_df = pd.DataFrame(columns=TIME_VARIABLE_COLUMNS)
 
@@ -287,7 +297,7 @@ def generate_historical_data(triage_levels: list) -> pd.DataFrame:
                 oxygenation=oxygenation[tp_n],
                 temperature=temperature[tp_n],
                 breathing_rate=breathing_rate[tp_n],
-                triage_level=triage_level
+                triage_level=triage_level,
             )
             measurements_df.append(data_at_tp, ignore_index=True)
 
@@ -298,7 +308,9 @@ def generate_data_for_each_patient(pfo_patients_data, pfi_patients_list):
     """Get all the patients from pfi_patients_list and create their dummy history."""
     assert os.path.exists(pfi_patients_list), pfi_patients_list
     df_patients = pd.read_csv(pfi_patients_list, index_col=0)
-    for patient_uuid, patient_age in tqdm(zip(df_patients["patientID"], df_patients["age"])):
+    for patient_uuid, patient_age in tqdm(
+        zip(df_patients["patientID"], df_patients["age"])
+    ):
         pfi_patient_data = os.path.join(pfo_patients_data, f"{patient_uuid}.csv")
         triage_levels = generate_random_triage_levels_for_a_patient(patient_age)
         historical_data_df = generate_historical_data(triage_levels)
@@ -318,18 +330,20 @@ if __name__ == "__main__":
 
     os.mkdir(data_folder)
 
-    pfi_centers_ = os.path.join(data_folder, 'centers.csv')
-    pfi_physicians_ = os.path.join(data_folder, 'physicians.csv')
-    pfi_patients_list_ = os.path.join(data_folder, 'patients_list.csv')
+    pfi_centers_ = os.path.join(data_folder, "centers.csv")
+    pfi_physicians_ = os.path.join(data_folder, "physicians.csv")
+    pfi_patients_list_ = os.path.join(data_folder, "patients_list.csv")
 
     print("Generating centers...")
     generate_centers(pfi_centers_)
     print("Generating physicians...")
     generate_physicians(pfi_physicians_)
     print("Generating patients list...")
-    generate_patients(pfi_patients_list_, pfi_centers=pfi_centers_, pfi_physicians=pfi_physicians_)
+    generate_patients(
+        pfi_patients_list_, pfi_centers=pfi_centers_, pfi_physicians=pfi_physicians_
+    )
 
-    pfo_patients_data_ = os.path.join(data_folder, 'patients_data')
+    pfo_patients_data_ = os.path.join(data_folder, "patients_data")
 
     os.mkdir(pfo_patients_data_)
 
