@@ -1,4 +1,4 @@
-,patient_uuid,name,surname,phone,city,language,age,preconditions,fitness,smoker,physician_name,physician_uuid,center_name,center_uuid
+,patientID,name,surname,phone,city,language,age,preconditions,fitness,smoker,clinician,clinicianID,organization,organizationID
 0,7uh7645fwn,Elaine,Anderson,+44(0)1184960725,Joshberg,Italian,91,Arthritis,7,False,"['Dr. Abdul Fraser', 'Dr. Trevor Barnes']","['h4tzfsiz2s', '0attzihsac']",['center_8'],['8cyq29lk3y']
 1,b5y47q2z9b,Oliver,Finch,(0114) 4960501,Lake Russellbury,German,68,Hypertension,9,False,['Dr. Lorraine Davies'],['a33sk93a7s'],['center_6'],['06r01ch7qv']
 2,oi2no5ztnm,Dorothy,Norman,(029)2018820,East Rosiefurt,German,105,None,3,False,['Dr. Neil Webster'],['ahbsm7stnl'],['center_1'],['5twg4jqwza']

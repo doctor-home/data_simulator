@@ -59,7 +59,7 @@ PRECONDITIONS = {"None" : 0.60,
                  "Asthma": 0.05, 
                  "Cancer":0.01, }
 
-FIX_COLUMN_NAMES = ["patient_uuid", 
+FIX_COLUMN_NAMES = ["patientID", 
                     "name", 
                     "surname", 
                     "phone", 
@@ -69,18 +69,18 @@ FIX_COLUMN_NAMES = ["patient_uuid",
                     "preconditions", 
                     "fitness",
                     "smoker",
-                    "physician_name", 
-                    "physician_uuid",
-                    "center_name",
-                    "center_uuid"]
+                    "clinician", 
+                    "clinicianID",
+                    "organization",
+                    "organizationID"]
 
-TIME_VARIABLE_COLUMNS = ["timestamp", 
-                         "hearth_rate",
-                         "oxigen_level",
+TIME_VARIABLE_COLUMNS = ["timestamp",
+                         "daysUnderInspection", 
+                         "hearthBeat",
+                         "oxygenation",
                          "temperature",
-                         "nr_days", 
-                         "breathing_rate",
-                         "label"]
+                         "breathingRate",
+                         "sick"]
 
 fix_df = pd.DataFrame(columns=FIX_COLUMN_NAMES)
 
