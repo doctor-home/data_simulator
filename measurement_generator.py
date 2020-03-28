@@ -27,7 +27,7 @@ FIX_COLUMN_NAMES = ["patientID",
 
 TIME_VARIABLE_COLUMNS = ["timestamp",
                          "daysUnderInspection", 
-                         "hearthBeat",
+                         "heartBeat",
                          "oxygenation",
                          "temperature",
                          "breathingRate",
@@ -42,7 +42,7 @@ monitored_patients = unique_patients.sample(frac=0.2, random_state=42)
 
 
 # helper functions:
-def get_hearthrate(is_sick):
+def get_heart_rate(is_sick):
     """
     get the heartrate of the patient
     params:
@@ -50,17 +50,20 @@ def get_hearthrate(is_sick):
     """
     # A normal resting heart rate for adults ranges from 60 to 100 beats per minute
     if is_sick:
-        high = bool(np.random.choice([0, 1], 1)[0])
-        if high:
-            return np.random.randint(100, high=160)
-        else:
+        severity = np.random.rand()
+        if 0 < severity < 0.1:
             return np.random.randint(30, high=60)
-    
+        elif 0.1 <= severity < 0.5:
+            return np.random.randint(100, high=140)
+        elif 0.5 <= severity < 0.9:
+            return np.random.randint(140, high=150)
+        else:
+            return np.random.randint(150, high=180)
     else:
         return np.random.randint(60, high=100)
 
 
-def get_oxigen(is_sick):
+def get_oxygen(is_sick: bool):
     """
     get the oxygen of the patient
     params:
@@ -70,12 +73,12 @@ def get_oxigen(is_sick):
         return np.random.uniform(low=0.89, high=0.94, size=1)[0]
     
     else:
-        mu, sigma = 0.97, 0.2  # mean and standard deviation
+        mu, sigma = 0.97, 0.2
         rate = np.random.normal(mu, sigma, 1,)[0]
         return rate if rate < 0.995 else 0.995
 
 
-def get_temperature(is_sick):
+def get_temperature(is_sick: bool):
     """
     get the temperature of the patient
     params:
@@ -85,7 +88,7 @@ def get_temperature(is_sick):
         return np.random.uniform(low=37.5, high=42.0, size=1)[0]
     
     else:
-        mu, sigma = 36.5, 0.5 # mean and standard deviation
+        mu, sigma = 36.5, 0.5
         return np.random.normal(mu, sigma, 1)[0]
 
 
@@ -125,8 +128,8 @@ if __name__ == "__main__":
             new_values = fixed_values + [
                 timestamp[0],  # timestamp
                 (datetime.date.today() - timestamp[0].date()).days,  # days in under measurement
-                get_hearthrate(sick),
-                get_oxigen(sick),
+                get_heart_rate(sick),
+                get_oxygen(sick),
                 get_temperature(sick),
                 get_breathing(sick),
                 sick
