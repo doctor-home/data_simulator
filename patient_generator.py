@@ -262,7 +262,7 @@ def generate_historical_data(triage_levels: list) -> pd.DataFrame:
 
     for triage_level in triage_levels:
 
-        heart_beat = get_heart_beats(triage_level, len(timepoints))
+        heart_beat = get_heart_beats(triage_level, len(list(timepoints)))
         oxygenation = get_oxygenation(triage_level, len(timepoints))
         temperature = get_temperature(triage_level, len(timepoints))
         breathing_rate = get_breathing_rate(triage_level, len(timepoints))
@@ -296,7 +296,7 @@ if __name__ == "__main__":
     # pfi: path to file
     # pfo: path to folder
     root = os.path.dirname(__file__)
-    data_folder = os.path.join(root, "data")
+    data_folder = os.path.join(root, "data_new")
 
     if os.path.exists(data_folder):
         raise ValueError(
