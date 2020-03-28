@@ -171,8 +171,24 @@ def generate_random_triage_levels_for_a_patient(age):
 def generate_historical_data(triage_levels: list) -> pd.DataFrame:
 
     def get_heart_beats(tl: int, ntp: int) -> list:
-        # TODOs
-        return []
+
+        criteria = np.random.choice(
+            ["random", "triage_level"],
+            [0.2, 0.8]
+        )
+
+        if criteria["random"]:
+            severity = np.random.uniform(0, 1)
+        else:  # triage level
+            severity = tl / np.max(TRIAGE_LEVELS) + np.random.normal(scale=0.3)
+            severity = np.clip(severity, a_min=0, a_max=1)
+
+        if 0 < severity < 0.5:
+            return np.random.randint(30, high=60)
+        elif 0.5 <= severity < 0.7:
+            return np.random.randint(100, high=140)
+        else:
+            return np.random.randint(140, high=150)
 
     def get_oxygenation(tl: int, ntp: int) -> list:
         return []
@@ -220,18 +236,9 @@ def generate_data_for_each_patient(pfo_patients_data, pfi_patients_list):
     df_patients = pd.read_csv(pfi_patients_list, index_col=0)
     for patient_uuid, patient_age in tqdm(zip(df_patients["patientID"], df_patients["age"])):
         pfi_patient_data = os.path.join(pfo_patients_data, f"{patient_uuid}.csv")
-
         triage_levels = generate_random_triage_levels_for_a_patient(patient_age)
-
         historical_data_df = generate_historical_data(triage_levels)
-
         historical_data_df.to_csv(pfi_patient_data)
-
-
-
-
-
-        pass
 
 
 if __name__ == "__main__":
