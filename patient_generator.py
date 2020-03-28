@@ -80,7 +80,7 @@ TIME_VARIABLE_COLUMNS = ["timestamp",
                          "oxygenation",
                          "temperature",
                          "breathingRate",
-                         "sick"]
+                         "patient"]
 
 fix_df = pd.DataFrame(columns=FIX_COLUMN_NAMES)
 
