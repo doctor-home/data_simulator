@@ -8,8 +8,9 @@ import numpy as np
 from faker import Faker
 from faker.providers import phone_number, address, person, date_time
 from tqdm import tqdm
+import string
 
-fake = Faker('en_UK')
+fake = Faker(['it_IT', 'en_UK', 'de_DE', 'nl_NL', 'fr_FR'])
 fake.add_provider(person)
 fake.add_provider(phone_number)
 fake.add_provider(address)    
@@ -80,13 +81,22 @@ def generate_physicians(pfi_physicians):
     physician_df = pd.DataFrame(columns=["physician_name", "physician_uuid"])
     physician_uuids = []
     names = []
+    usernames = []
+    passwords = []
 
     for _ in tqdm(range(500)):
         physician_uuids.append(_get_uuid())
-        names.append("Dr. " + fake.first_name() + " " + fake.last_name())
+        first_name = fake.first_name()
+        last_name = fake.last_name()
+        names.append("Dr. " + first_name + " " + last_name)
+        usernames.append(string.lower(first_name + "_" + last_name).replace(" ", ""))
+        password.append(fake.)
+        
+
 
     physician_df["physician_name"] = names
     physician_df["physician_uuid"] = physician_uuids
+
 
     physician_df.to_csv(pfi_physicians)
 
@@ -295,7 +305,7 @@ def generate_data_for_each_patient(pfo_patients_data, pfi_patients_list):
 if __name__ == "__main__":
     # pfi: path to file
     # pfo: path to folder
-    root = os.path.dirname(os.path.dirname(__file__))
+    root = os.path.dirname(__file__)
     data_folder = os.path.join(root, "data")
 
     if os.path.exists(data_folder):
