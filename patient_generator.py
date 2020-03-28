@@ -295,7 +295,7 @@ def generate_data_for_each_patient(pfo_patients_data, pfi_patients_list):
 if __name__ == "__main__":
     # pfi: path to file
     # pfo: path to folder
-    root = os.path.dirname(os.path.dirname(__file__))
+    root = os.path.dirname(__file__)
     data_folder = os.path.join(root, "data")
 
     if os.path.exists(data_folder):
