@@ -120,7 +120,6 @@ def generate_patients(
 
     this_year = datetime.date.today().year
     physician_df = pd.read_csv(pfi_physicians)
-    centers_df = pd.read_csv(pfi_centers)
 
     fix_df = pd.DataFrame(columns=FIX_COLUMN_NAMES)
 
