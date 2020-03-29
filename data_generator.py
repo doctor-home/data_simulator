@@ -249,10 +249,10 @@ def get_temperature(tl: int, ntp: int) -> list:
     def get_one_readout(sev):
         if 0 <= sev < 0.6:
             # normal
-            np.round(np.random.uniform(36.5, 37.5), decimals=1)
+            return np.round(np.random.uniform(36.5, 37.5), decimals=1)
         elif 0.6 <= sev < 0.85:
             # medium
-            np.round(np.random.uniform(37.5, 39), decimals=1)
+            return np.round(np.random.uniform(37.5, 39), decimals=1)
         else:
             # high
             return np.round(np.random.uniform(39, 41), decimals=1)
@@ -319,9 +319,10 @@ def generate_historical_data(triage_levels: list) -> pd.DataFrame:
     return measurements_df
 
 
-def generate_data_for_each_patient(pfi_measured_data, pfi_patients_list):
+def generate_data_for_each_patient(pfi_measured_data, pfi_patients_list, single_file=True):
     """
     Get all the patients from pfi_patients_list and create their dummy history.
+    All patients measurements in a single .csv file (>100k lines), to be grouped by patient id.
     """
     assert os.path.exists(pfi_patients_list), pfi_patients_list
 
