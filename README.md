@@ -2,13 +2,13 @@
 To create simulated patient's data.
 
 <p align="center"> 
-<img src="https://github.com/Doctor@home/data_simulator/blob/master/docs/doctor_at_home_architecture_overview.pdf" width="350">
+<img src="https://github.com/Doctor@home/data_simulator/blob/master/docs/doctor_at_home_architecture_overview.png" width="350">
 </p>
 
 Developed as part of Doctor@Home group during #CodeVsCovid19 72 hours hackaton.
 
 <p align="center"> 
-<img src="https://github.com/doctor-home/data_simulator/blob/master/docs/oximeter.jpg" width="350">
+<img src="https://github.com/doctor-home/data_simulator/blob/master/docs/oximeter.jpg" width="250">
 </p>
 
 
