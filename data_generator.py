@@ -76,26 +76,37 @@ def generate_centers(pfi_centers):
     center_df.to_csv(pfi_centers)
 
 
-def generate_physicians(pfi_physicians):
+def generate_physicians(pfi_physicians, pfi_centers):
     """ Create list of Doctors:"""
     physician_df = pd.DataFrame(columns=["physician_name", "physician_uuid"])
+    centers_df = pd.read_csv(pfi_centers)
+
     physician_uuids = []
     names = []
     usernames = []
     passwords = []
+    center_names = []
+    center_uuids = []
 
     for _ in tqdm(range(500)):
         physician_uuids.append(_get_uuid())
         first_name = fake.first_name()
         last_name = fake.last_name()
+
         names.append("Dr. " + first_name + " " + last_name)
         usernames.append((first_name + "_" + last_name).replace(" ", "").lower())
         passwords.append("_".join(fake.words(nb=3)))
+
+        center = centers_df.sample(1)
+        center_names.append(center["center_name"].values.tolist()[0])
+        center_uuids.append(center["center_uuid"].values.tolist()[0])
 
     physician_df["physician_name"] = names
     physician_df["physician_uuid"] = physician_uuids
     physician_df["physician_username"] = usernames
     physician_df["physician_password"] = passwords
+    physician_df["center_name"] = center_names
+    physician_df["center_uuid"] = center_uuids
 
     physician_df.to_csv(pfi_physicians)
 
@@ -116,10 +127,8 @@ def generate_patients(
     for _ in tqdm(range(num_patients)):
 
         nr_physicians = np.random.choice([1, 2, 3], 1, p=[0.75, 0.2, 0.05])[0]
-        nr_centers = np.random.choice([1, 2], 1, p=[0.9, 0.1])[0]
 
         physician = physician_df.sample(nr_physicians)
-        center = centers_df.sample(nr_centers)
 
         row = [
             _get_uuid(),
@@ -143,8 +152,8 @@ def generate_patients(
             bool(np.random.choice([0, 1], 1, p=[0.85, 0.15])[0]),  # smoker
             physician["physician_name"].values.tolist(),
             physician["physician_uuid"].values.tolist(),
-            center["center_name"].values.tolist(),
-            center["center_uuid"].values.tolist(),
+            physician["center_name"].values.tolist(),
+            physician["center_uuid"].values.tolist(),
         ]
 
         fix_df.loc[len(fix_df)] = row
@@ -271,7 +280,9 @@ def get_breathing_rate(tl: int, ntp: int) -> list:
 
 def generate_historical_data(triage_levels: list) -> pd.DataFrame:
 
-    nr_measurements = np.random.randint(3, 50)
+    nr_measurements = np.random.choice(
+            list(range(3, 8)), 1, p=(np.array(list(range(7, 2, -1))) / sum(list(range(3, 8)))).tolist())[0]
+
     timepoints = fake.time_series(
         start_date="-{}d".format(nr_measurements),
         end_date=NOW,
@@ -305,19 +316,24 @@ def generate_historical_data(triage_levels: list) -> pd.DataFrame:
     return measurements_df
 
 
-def generate_data_for_each_patient(pfo_patients_data, pfi_patients_list):
+def generate_data_for_each_patient(pfi_measured_data, pfi_patients_list):
     """
     Get all the patients from pfi_patients_list and create their dummy history.
     """
     assert os.path.exists(pfi_patients_list), pfi_patients_list
 
     df_patients = pd.read_csv(pfi_patients_list, index_col=0)
+
+    df_measurements = pd.DataFrame(columns = ["patientID"] + TIME_VARIABLE_COLUMNS)
+
     for patient_uuid, patient_age in tqdm(zip(df_patients["patientID"], df_patients["age"])):
-        pfi_patient_data = os.path.join(pfo_patients_data, f"{patient_uuid}.csv")
         triage_levels = generate_random_triage_levels_for_a_patient(patient_age)
         historical_data_df = generate_historical_data(triage_levels)
-        historical_data_df.to_csv(pfi_patient_data)
+        historical_data_df["patientID"] = [patient_uuid for _ in range(len(historical_data_df))]
+        df_measurements = pd.concat([df_measurements, historical_data_df])
 
+    df_measurements = df_measurements.reset_index().drop(["index"], axis= 1)
+    df_measurements.to_csv(pfi_measured_data)
 
 if __name__ == "__main__":
     # pfi: path to file
@@ -339,15 +355,13 @@ if __name__ == "__main__":
     print("Generating centers...")
     generate_centers(pfi_centers_)
     print("Generating physicians...")
-    generate_physicians(pfi_physicians_)
+    generate_physicians(pfi_physicians_, pfi_centers_)
     print("Generating patients list...")
     generate_patients(
-        pfi_patients_list_, pfi_centers=pfi_centers_, pfi_physicians=pfi_physicians_,
+        pfi_patients_list_, pfi_centers=pfi_centers_, pfi_physicians=pfi_physicians_, num_patients=5
     )
 
-    pfo_patients_data_ = os.path.join(data_folder, "patients_data")
-
-    os.mkdir(pfo_patients_data_)
+    pfi_physicians_ = os.path.join(data_folder, "measurements.csv")
 
     print("Generating patients data...")
-    generate_data_for_each_patient(pfo_patients_data_, pfi_patients_list_)
+    generate_data_for_each_patient(pfi_physicians_, pfi_patients_list_)

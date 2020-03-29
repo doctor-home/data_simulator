@@ -23,7 +23,9 @@ There are a total of 500 physicians in there. Each of them has the following att
  - ```physician_name``` : The name of the doctor (string)
  - ```physician_uuid``` : A unique identifier for each doctor (string)
  - ```physician_username``` : usrename of each doctor (string)
- - ```physician_uuid``` : password each doctor (string)
+ - ```physician_password``` : password each doctor (string)
+ - ```center_name``` : The name of the doctor's hospital (string)
+ - ```center_uuid``` : A unique identifier for each doctor's hospital (string)
 
 ### Patients
 The patients are stored in ```data/patients_list.csv```.
@@ -44,12 +46,13 @@ There are a total of 5'000 patients in there. Each of them has the following att
  - ```organizationID``` : List of unique identifiers of responsible organizations (List of string)
 
  ### Measurements
-The monitored health records of 5000 patients are stored in ```data_new/patients_data/{patientID}.csv```.
+The monitored health records of 5000 patients are stored in ```data_new/measurements.csv```.
 Each of them has the following attributes:
+ - ```patientID``` : unique identifier of each patient (string)
  - ```timestamp``` : time, when the health data was recorded (timedate)
- - ```hearthBeat``` : Harthbeat of patient at timestamp (int)
+ - ```heartBeat``` : Heartbeat of patient at timestamp (int)
  - ```oxygenation``` : Level of Oxygen at timestamp (float)
  - ```temperature``` : Temperature at timestamp (float)
  - ```breathingRate``` : Respiratory rate at timestamp (int)
- - ```triage_level``` : Severity of Sickness (int - [0,4])
+ - ```triage_level``` : Severity of Sickness (int - [1,5])
 
