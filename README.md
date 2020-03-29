@@ -62,7 +62,7 @@ There are a total of 5'000 patients in there. Each of them has the following att
  ### Measurements
 The monitored health records of 5000 patients are stored in ```data_new/measurements.csv```.
 Each of them has the following attributes:
- - ```patientID``` : unique identifier of each patient (string) embedded in the filename.
+ - ```patientID``` : unique identifier of each patient (string).
  - ```timestamp``` : time, when the health data was recorded (timedate)
  - ```heart_beat``` : Heartbeat of patient at timestamp (int)
  - ```oxygenation``` : Level of Oxygen at timestamp (float)
