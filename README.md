@@ -1,14 +1,30 @@
-# Data Generator
-This repository is used to create sample patient data of patients.
-The main component used is the Faker library (https://github.com/joke2k/faker)
+# Data simulator
+To create simulated patient's data.
 
-## Run Script
+<p align="center"> 
+<img src="https://github.com/Doctor@home/data_simulator/docs/doctor_at_home_architecture_overview.pdf" width="350">
+</p>
+
+Developed as part of Doctor@Home group during #CodeVsCovid19 72 hours hackaton.
+
+<p align="center"> 
+<img src="https://github.com/Doctor@home/data_simulator/docs/oxymeter.jpg" width="350">
+</p>
+
+
+Real data are collected via Oxymeter and Thermometer from patients' home, automatically triaged via ML algorithm
+and the consequent diagnosis is sent to the monitoring hospital. The resulting DB would also form a source of
+information to study the impact of the virus according to age/previous conditions, and how symptoms evolve over time.  
+
+## Install and run
+
 ```pip install -r requirements.txt```
 
 ```python data_generator.py```
 
 
 ## Data Files
+
 ### Organizations
 The organizations / hospitals are stored in ```data_new/centers.csv```.
 There are a total of 10 organizations in there. Each of them has the following attributes:
@@ -46,11 +62,11 @@ There are a total of 5'000 patients in there. Each of them has the following att
  ### Measurements
 The monitored health records of 5000 patients are stored in ```data_new/measurements.csv```.
 Each of them has the following attributes:
- - ```patientID``` : unique identifier of each patient (string)
+ - ```patientID``` : unique identifier of each patient (string) embedded in the filename.
  - ```timestamp``` : time, when the health data was recorded (timedate)
- - ```heartBeat``` : Heartbeat of patient at timestamp (int)
+ - ```heart_beat``` : Heartbeat of patient at timestamp (int)
  - ```oxygenation``` : Level of Oxygen at timestamp (float)
  - ```temperature``` : Temperature at timestamp (float)
- - ```breathingRate``` : Respiratory rate at timestamp (int)
+ - ```breathing_rate``` : Respiratory rate at timestamp (int)
  - ```triage_level``` : Severity of Sickness (int - [1,5])
 

@@ -1,7 +1,6 @@
 import os
 import datetime
 import uuid
-import glob
 
 import pandas as pd
 import numpy as np
@@ -265,14 +264,15 @@ def get_breathing_rate(tl: int, ntp: int) -> list:
     """Triage level and number of time-points to breathing rate per minute"""
 
     def get_one_readout(sev):
-        # normal 12 to 20
-        if 0 < sev < 0.7:
+
+        if 0 <= sev < 0.7:
+            # normal 12 to 20
             return np.random.randint(12, high=20)
-        # abnormal 20 to 25
-        if 0 < sev < 0.7:
+        elif 0.7 <= sev < 0.85:
+            # abnormal 20 to 25
             return np.random.randint(20, high=25)
-        # abnormal 25 to 30
-        if 0 < sev < 0.7:
+        else:
+            # abnormal 25 to 30
             return np.random.randint(25, high=30)
 
     return get_readouts(tl, ntp, get_one_readout)
@@ -360,16 +360,16 @@ if __name__ == "__main__":
     pfi_physicians_ = os.path.join(data_folder, "physicians.csv")
     pfi_patients_list_ = os.path.join(data_folder, "patients_list.csv")
 
-    print("Generating centers...")
+    print("\nGenerating centers...")
     generate_centers(pfi_centers_)
-    print("Generating physicians...")
+    print("\nGenerating physicians...")
     generate_physicians(pfi_physicians_, pfi_centers_)
-    print("Generating patients list...")
+    print("\nGenerating patients list...")
     generate_patients(
         pfi_patients_list_, pfi_centers=pfi_centers_, pfi_physicians=pfi_physicians_,
     )
 
     pfi_physicians_ = os.path.join(data_folder, "measurements.csv")
 
-    print("Generating patients data...")
+    print("\nGenerating patients data...")
     generate_data_for_each_patient(pfi_physicians_, pfi_patients_list_)
