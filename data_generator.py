@@ -43,6 +43,7 @@ FIX_COLUMN_NAMES = [
     "clinicianID",
     "organization",
     "organizationID",
+    "under_observation"
 ]
 
 TIME_VARIABLE_COLUMNS = [
@@ -153,6 +154,7 @@ def generate_patients(
             physician["physician_uuid"].values.tolist(),
             physician["center_name"].values.tolist(),
             physician["center_uuid"].values.tolist(),
+            np.random.choice([True, False], p=[0.2, 0.8])  # under observation
         ]
 
         fix_df.loc[len(fix_df)] = row
