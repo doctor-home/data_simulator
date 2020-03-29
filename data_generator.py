@@ -281,7 +281,10 @@ def get_breathing_rate(tl: int, ntp: int) -> list:
 def generate_historical_data(triage_levels: list) -> pd.DataFrame:
 
     nr_measurements = np.random.choice(
-            list(range(3, 8)), 1, p=(np.array(list(range(7, 2, -1))) / sum(list(range(3, 8)))).tolist())[0]
+        list(range(3, 8)),
+        1,
+        p=(np.array(list(range(7, 2, -1))) / sum(list(range(3, 8)))).tolist(),
+    )[0]
 
     timepoints = fake.time_series(
         start_date="-{}d".format(nr_measurements),
@@ -290,12 +293,12 @@ def generate_historical_data(triage_levels: list) -> pd.DataFrame:
         distrib=None,
         tzinfo=None,
     )
-    
+
     measurements_df = pd.DataFrame(columns=TIME_VARIABLE_COLUMNS)
-    
+
     timepoints = list(timepoints)
     num_timepoints = len(timepoints)
-    
+
     for triage_level in triage_levels:
         heart_beat = get_heart_beats(triage_level, num_timepoints)
         oxygenation = get_oxygenation(triage_level, num_timepoints)
@@ -324,16 +327,21 @@ def generate_data_for_each_patient(pfi_measured_data, pfi_patients_list):
 
     df_patients = pd.read_csv(pfi_patients_list, index_col=0)
 
-    df_measurements = pd.DataFrame(columns = ["patientID"] + TIME_VARIABLE_COLUMNS)
+    df_measurements = pd.DataFrame(columns=["patientID"] + TIME_VARIABLE_COLUMNS)
 
-    for patient_uuid, patient_age in tqdm(zip(df_patients["patientID"], df_patients["age"])):
+    for patient_uuid, patient_age in tqdm(
+        zip(df_patients["patientID"], df_patients["age"])
+    ):
         triage_levels = generate_random_triage_levels_for_a_patient(patient_age)
         historical_data_df = generate_historical_data(triage_levels)
-        historical_data_df["patientID"] = [patient_uuid for _ in range(len(historical_data_df))]
+        historical_data_df["patientID"] = [
+            patient_uuid for _ in range(len(historical_data_df))
+        ]
         df_measurements = pd.concat([df_measurements, historical_data_df])
 
-    df_measurements = df_measurements.reset_index().drop(["index"], axis= 1)
+    df_measurements = df_measurements.reset_index().drop(["index"], axis=1)
     df_measurements.to_csv(pfi_measured_data)
+
 
 if __name__ == "__main__":
     # pfi: path to file
@@ -358,7 +366,7 @@ if __name__ == "__main__":
     generate_physicians(pfi_physicians_, pfi_centers_)
     print("Generating patients list...")
     generate_patients(
-        pfi_patients_list_, pfi_centers=pfi_centers_, pfi_physicians=pfi_physicians_, num_patients=5
+        pfi_patients_list_, pfi_centers=pfi_centers_, pfi_physicians=pfi_physicians_,
     )
 
     pfi_physicians_ = os.path.join(data_folder, "measurements.csv")

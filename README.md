@@ -5,9 +5,7 @@ The main component used is the Faker library (https://github.com/joke2k/faker)
 ## Run Script
 ```pip install -r requirements.txt```
 
-```python patient_generator.py```
-
-```python measurement_generator.py```
+```python data_generator.py```
 
 
 ## Data Files
