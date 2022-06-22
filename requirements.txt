@@ -1,4 +1,4 @@
 tqdm==4.43.0
-numpy==1.18.2
+numpy==1.22.0
 pandas==1.0.3
 Faker==4.0.2
